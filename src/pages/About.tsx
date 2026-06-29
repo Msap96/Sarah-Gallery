@@ -16,7 +16,7 @@ export const About: React.FC = () => {
         <img 
           src={artistInfo.portraitUrl} 
           alt={artistInfo.name} 
-          className="w-full h-full object-cover filter grayscale opacity-90"
+          className="w-full h-full object-cover"
         />
       </motion.div>
       <motion.div 
