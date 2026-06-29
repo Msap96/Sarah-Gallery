@@ -56,7 +56,7 @@ export const Home: React.FC = () => {
               Enter the Gallery
             </NavLink>
             <a 
-              href="#" 
+              href="https://metasteps.com/viewer/028ab4de-7fdb-47a8-a00d-948cb53ad6fd" 
               target="_blank" 
               rel="noreferrer"
               className="inline-block px-8 py-4 border border-[#2D2926] text-[#2D2926] text-[10px] tracking-widest font-bold uppercase hover:bg-[#2D2926] hover:text-[#F7F5F2] transition-colors w-full sm:w-auto"

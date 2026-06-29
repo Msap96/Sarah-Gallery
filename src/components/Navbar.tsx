@@ -26,7 +26,7 @@ export const Navbar: React.FC = () => {
               Bio
             </NavLink>
             <a 
-              href="#" 
+              href="https://metasteps.com/viewer/028ab4de-7fdb-47a8-a00d-948cb53ad6fd" 
               target="_blank" 
               rel="noreferrer"
               className="transition-colors hover:opacity-100 flex items-center gap-1"
