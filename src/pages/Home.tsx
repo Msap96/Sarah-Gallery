@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 export const Home: React.FC = () => {
   const { artworks } = useGallery();
   const featuredWorks = artworks.filter(art => art.featured).slice(0, 3);
-  const heroImages = featuredWorks.map(work => work.imageUrl);
+  const heroImages = artworks.map(work => work.imageUrl);
   const [heroIndex, setHeroIndex] = useState(0);
 
   useEffect(() => {
@@ -43,26 +43,10 @@ export const Home: React.FC = () => {
           )}
         </AnimatePresence>
         <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
-          <motion.h1 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-serif text-5xl md:text-7xl italic text-[#2D2926] mb-6 leading-tight"
-          >
-            Structure &<br />Silence
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-[10px] uppercase tracking-widest text-[#8C7E6D] mb-10 max-w-xl mx-auto"
-          >
-            A curated exhibition exploring the empty spaces and quiet architectures of modern life.
-          </motion.p>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-col sm:flex-row justify-center items-center gap-4"
           >
             <NavLink 
