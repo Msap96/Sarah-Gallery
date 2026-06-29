@@ -132,6 +132,10 @@ export const WorkDetail: React.FC = () => {
               <button disabled className="w-full py-3 border border-[#E5E1DA] text-[#8C7E6D] cursor-not-allowed uppercase tracking-widest text-[10px] font-bold">
                 Sold Out
               </button>
+            ) : work.status === 'not-for-sale' ? (
+              <button disabled className="w-full py-3 border border-[#E5E1DA] text-[#8C7E6D] cursor-not-allowed uppercase tracking-widest text-[10px] font-bold">
+                Not for Sale
+              </button>
             ) : (
               <>
                 <button

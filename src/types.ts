@@ -9,7 +9,7 @@ export interface Artwork {
   additionalImageUrls?: string[];
   collection: string;
   featured?: boolean;
-  status: 'available' | 'sold';
+  status: 'available' | 'sold' | 'not-for-sale';
   description?: string;
 }
 

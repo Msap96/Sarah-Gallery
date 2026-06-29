@@ -39,6 +39,8 @@ export const ArtworkCard: React.FC<Props> = ({ artwork, index }) => {
           )}
           {artwork.status === 'sold' ? (
             <span className="opacity-40 italic">Sold</span>
+          ) : artwork.status === 'not-for-sale' ? (
+            <span className="opacity-40 italic">Not for sale</span>
           ) : (
             <span className="text-[#5E503F]">Available</span>
           )}
