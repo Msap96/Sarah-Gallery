@@ -6,9 +6,10 @@ import { motion } from 'motion/react';
 interface Props {
   artwork: Artwork;
   index: number;
+  compact?: boolean;
 }
 
-export const ArtworkCard: React.FC<Props> = ({ artwork, index }) => {
+export const ArtworkCard: React.FC<Props> = ({ artwork, index, compact = false }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -29,22 +30,26 @@ export const ArtworkCard: React.FC<Props> = ({ artwork, index }) => {
           <h3 className="font-serif text-lg mb-1 italic group-hover:opacity-70 transition-opacity">
             <NavLink to={`/work/${artwork.id}`}>{artwork.title}</NavLink>
           </h3>
-          <p className="text-[10px] uppercase tracking-widest text-[#8C7E6D] mb-2">{artwork.medium}, {artwork.year}</p>
-        </div>
-        <div className="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold mt-2">
-          {artwork.price > 0 ? (
-            <span>${artwork.price.toLocaleString()}</span>
-          ) : (
-            <span className="text-[#8C7E6D]">Inquire</span>
-          )}
-          {artwork.status === 'sold' ? (
-            <span className="opacity-40 italic">Sold</span>
-          ) : artwork.status === 'not-for-sale' ? (
-            <span className="opacity-40 italic">Not for sale</span>
-          ) : (
-            <span className="text-[#5E503F]">Available</span>
+          {!compact && (
+            <p className="text-[10px] uppercase tracking-widest text-[#8C7E6D] mb-2">{artwork.medium}, {artwork.year}</p>
           )}
         </div>
+        {!compact && (
+          <div className="flex items-center justify-between text-[10px] uppercase tracking-widest font-bold mt-2">
+            {artwork.price > 0 ? (
+              <span>${artwork.price.toLocaleString()}</span>
+            ) : (
+              <span className="text-[#8C7E6D]">Inquire</span>
+            )}
+            {artwork.status === 'sold' ? (
+              <span className="opacity-40 italic">Sold</span>
+            ) : artwork.status === 'not-for-sale' ? (
+              <span className="opacity-40 italic">Not for sale</span>
+            ) : (
+              <span className="text-[#5E503F]">Available</span>
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   );
