@@ -2,9 +2,9 @@ import { ArtistInfo, Artwork, Collection } from './types';
 
 export const collections: Collection[] = [
   {
-    id: 'selected-works',
-    title: 'Selected Works',
-    description: 'A curated selection of original paintings and studies.',
+    id: 'available-works',
+    title: 'Available Works',
+    description: 'Original paintings currently available for acquisition.',
   },
 ];
 
