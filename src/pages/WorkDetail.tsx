@@ -16,14 +16,14 @@ export const WorkDetail: React.FC = () => {
   const work = artworks.find(a => a.id === id);
 
   const [isInquiryModalOpen, setIsInquiryModalOpen] = useState(false);
-  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [zipCode, setZipCode] = useState('');
+  const [website, setWebsite] = useState('');
+  const [sending, setSending] = useState(false);
+  const [inquiryResult, setInquiryResult] = useState<'idle' | 'success' | 'error'>('idle');
+  const [inquiryError, setInquiryError] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showInRoom, setShowInRoom] = useState(false);
 
@@ -34,32 +34,27 @@ export const WorkDetail: React.FC = () => {
   const images = getArtworkImages(work);
   const activeImage = images[activeImageIndex] ?? work.imageUrl;
 
-  const handleInquirySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const subject = encodeURIComponent(`Inquiry: ${work.title}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nArtwork: ${work.title}\n\n${message}`
-    );
-    window.location.href = `mailto:${artistInfo.email}?subject=${subject}&body=${body}`;
-    setIsInquiryModalOpen(false);
-    setName('');
-    setEmail('');
-    setMessage('');
-  };
-
-  const handlePurchaseSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const subject = encodeURIComponent(`Purchase request: ${work.title}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nArtwork: ${work.title}\nPrice: ${work.price > 0 ? `$${work.price.toLocaleString()}` : 'Inquire for price'}\n\nAddress: ${address}\nCity: ${city}\nZIP: ${zipCode}`
-    );
-    window.location.href = `mailto:${artistInfo.email}?subject=${subject}&body=${body}`;
-    setIsPurchaseModalOpen(false);
-    setName('');
-    setEmail('');
-    setAddress('');
-    setCity('');
-    setZipCode('');
+  const handleInquirySubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (sending) return;
+    setSending(true);
+    setInquiryResult('idle');
+    try {
+      const response = await fetch('/api/inquiry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message, artworkId: work.id, website }),
+        signal: AbortSignal.timeout(15_000),
+      });
+      const result = await response.json().catch(() => null) as { ok?: boolean; error?: string } | null;
+      if (!response.ok || result?.ok !== true) throw new Error(result?.error || 'The inquiry form is temporarily unavailable. Please try again or email the studio.');
+      setInquiryResult('success');
+      setName(''); setEmail(''); setMessage(''); setWebsite('');
+    } catch (error) {
+      setInquiryError(error instanceof Error && error.name === 'Error'
+        ? error.message : 'The inquiry could not be confirmed. Please check your connection and try again, or email the studio.');
+      setInquiryResult('error');
+    } finally { setSending(false); }
   };
 
   return (
@@ -195,64 +190,44 @@ export const WorkDetail: React.FC = () => {
                 Not for Sale
               </button>
             ) : (
-              <>
-                <button
-                  onClick={() => setIsPurchaseModalOpen(true)}
-                  className="w-full py-3 bg-[#2D2926] text-[#F7F5F2] hover:bg-[#5E503F] transition-colors uppercase tracking-widest text-[10px] font-bold"
-                >
-                  Purchase Selection
-                </button>
-                <button
-                  onClick={() => setIsInquiryModalOpen(true)}
-                  className="w-full py-3 border border-[#2D2926] text-[#2D2926] hover:bg-[#2D2926] hover:text-[#F7F5F2] transition-colors uppercase tracking-widest text-[10px] font-bold"
-                >
-                  Send Request
-                </button>
-              </>
+              <button
+                onClick={() => { setInquiryResult('idle'); setIsInquiryModalOpen(true); }}
+                className="w-full py-3 bg-[#2D2926] text-[#F7F5F2] hover:bg-[#5E503F] transition-colors uppercase tracking-widest text-[10px] font-bold"
+              >
+                Inquire about this work
+              </button>
             )}
           </div>
         </motion.div>
       </div>
 
-      <Modal isOpen={isInquiryModalOpen} onClose={() => setIsInquiryModalOpen(false)} title="Inquire About Work">
-        <form onSubmit={handleInquirySubmit} className="space-y-4">
-          <p className="text-xs text-[#5E503F] mb-4">Fill in your details — your email app will open to send the inquiry about "{work.title}".</p>
-          <input required type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/50 border border-[#E5E1DA] px-3 py-2 text-[10px] focus:outline-none focus:border-[#8C7E6D]" placeholder="Name" />
-          <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-white/50 border border-[#E5E1DA] px-3 py-2 text-[10px] focus:outline-none focus:border-[#8C7E6D]" placeholder="Email" />
-          <textarea value={message} onChange={e => setMessage(e.target.value)} className="w-full bg-white/50 border border-[#E5E1DA] px-3 py-2 text-[10px] focus:outline-none focus:border-[#8C7E6D] resize-none" rows={3} placeholder="Message (Optional)" />
-          <button type="submit" className="w-full border border-[#2D2926] py-3 text-[10px] uppercase tracking-widest font-bold hover:bg-[#2D2926] hover:text-[#F7F5F2] mt-4">
-            Open Email to Send
-          </button>
-        </form>
-      </Modal>
-
-      <Modal isOpen={isPurchaseModalOpen} onClose={() => setIsPurchaseModalOpen(false)} title="Purchase Request">
-        <form onSubmit={handlePurchaseSubmit} className="space-y-4">
-          <div className="bg-[#EAE7E1] border border-[#E5E1DA] p-4 mb-4 flex items-center space-x-4">
-            <ArtImage
-              src={work.imageUrl}
-              alt={work.title}
-              sizes="48px"
-              className="w-12 h-12 object-cover border border-[#E5E1DA]"
-            />
-            <div>
-              <div className="font-serif italic text-sm text-[#2D2926]">{work.title}</div>
-              <div className="text-[10px] uppercase tracking-widest text-[#8C7E6D]">
-                {work.price > 0 ? `$${work.price.toLocaleString()}` : 'Price on request'}
-              </div>
+      <Modal isOpen={isInquiryModalOpen} onClose={() => { if (!sending) setIsInquiryModalOpen(false); }} title="Inquire About Work">
+        {inquiryResult === 'success' ? (
+          <div role="status" className="text-sm leading-relaxed">
+            <p>Your inquiry has been sent to the studio. Sarah can reply to your email address.</p>
+            <button type="button" className="mt-6 border border-[#2D2926] px-4 py-3" onClick={() => setIsInquiryModalOpen(false)}>Done</button>
+          </div>
+        ) : (
+          <form onSubmit={handleInquirySubmit} className="space-y-4" aria-busy={sending}>
+            <p className="text-xs text-[#5E503F]">Ask about “{work.title}”. The studio will respond by email.</p>
+            <label className="block text-xs" htmlFor="inquiry-name">Name</label>
+            <input disabled={sending} id="inquiry-name" name="name" autoComplete="name" required maxLength={120} type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/50 border border-[#E5E1DA] px-3 py-2 text-sm" />
+            <label className="block text-xs" htmlFor="inquiry-email">Email</label>
+            <input disabled={sending} id="inquiry-email" name="email" autoComplete="email" required maxLength={254} type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-white/50 border border-[#E5E1DA] px-3 py-2 text-sm" />
+            <label className="block text-xs" htmlFor="inquiry-message">Message (optional)</label>
+            <textarea disabled={sending} id="inquiry-message" name="message" maxLength={5000} value={message} onChange={e => setMessage(e.target.value)} className="w-full bg-white/50 border border-[#E5E1DA] px-3 py-2 text-sm resize-none" rows={3} />
+            <div hidden aria-hidden="true">
+              <label htmlFor="inquiry-website">Website</label>
+              <input id="inquiry-website" name="website" tabIndex={-1} autoComplete="off" value={website} onChange={e => setWebsite(e.target.value)} />
             </div>
-          </div>
-          <input required type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-white/50 border border-[#E5E1DA] px-3 py-2 text-[10px] focus:outline-none focus:border-[#8C7E6D]" placeholder="Full Name" />
-          <input required type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full bg-white/50 border border-[#E5E1DA] px-3 py-2 text-[10px] focus:outline-none focus:border-[#8C7E6D]" placeholder="Email" />
-          <input required type="text" value={address} onChange={e => setAddress(e.target.value)} className="w-full bg-white/50 border border-[#E5E1DA] px-3 py-2 text-[10px] focus:outline-none focus:border-[#8C7E6D]" placeholder="Street Address" />
-          <div className="flex space-x-2">
-            <input required type="text" value={city} onChange={e => setCity(e.target.value)} className="w-1/2 bg-white/50 border border-[#E5E1DA] px-3 py-2 text-[10px] focus:outline-none focus:border-[#8C7E6D]" placeholder="City" />
-            <input required type="text" value={zipCode} onChange={e => setZipCode(e.target.value)} className="w-1/2 bg-white/50 border border-[#E5E1DA] px-3 py-2 text-[10px] focus:outline-none focus:border-[#8C7E6D]" placeholder="ZIP / Postal Code" />
-          </div>
-          <button type="submit" className="w-full border border-[#2D2926] py-3 text-[10px] uppercase tracking-widest font-bold hover:bg-[#2D2926] hover:text-[#F7F5F2] mt-4">
-            Open Email to Send
-          </button>
-        </form>
+            {inquiryResult === 'error' && <p role="alert" className="text-sm text-red-800">{inquiryError}</p>}
+            <button disabled={sending} type="submit" className="w-full border border-[#2D2926] py-3 text-[10px] uppercase tracking-widest font-bold hover:bg-[#2D2926] hover:text-[#F7F5F2] disabled:opacity-50">
+              {sending ? 'Sending…' : 'Send inquiry'}
+            </button>
+            <p className="text-xs leading-relaxed text-[#5E503F]">Your name, email and message are used to respond to this inquiry.</p>
+            <p className="text-xs">You can also email <a className="underline break-all" href={`mailto:${artistInfo.email}`}>{artistInfo.email}</a>.</p>
+          </form>
+        )}
       </Modal>
     </div>
   );

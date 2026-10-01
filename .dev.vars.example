@@ -1,0 +1,4 @@
+# Copy to .dev.vars for local Worker testing. Real values stay out of Git.
+RESEND_API_KEY=
+INQUIRY_FROM=
+INQUIRY_TO=

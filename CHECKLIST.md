@@ -33,17 +33,17 @@ Scope: complete source package, patched dependencies, CI, content/image checks, 
 - [x] Mobile menu Escape and focus restoration.
 - [x] Browser-check desktop/narrow layouts and keyboard behavior.
 
-## 3. Reliable inquiries — IN PROGRESS
+## 3. Reliable inquiries — LOCAL CHECKS PASSED
 
 Scope: one inquiry flow, no address/payment collection; server validation, spam protection, provider acceptance, explicit UI states and input retention after failure.
 
-- [ ] Replace purchase/mailto forms with one labeled form.
-- [ ] Same-origin API, validation, honeypot, rate limit, provider timeout/errors.
-- [ ] Automated valid/invalid/spam/unconfigured/provider-failure tests with mocked provider.
-- [ ] Browser-test validation, errors, retry, retained input and success.
+- [x] Replace purchase/mailto forms with one labeled form.
+- [x] Same-origin API, validation, honeypot, rate limit, provider timeout/errors.
+- [x] Automated valid/invalid/spam/unconfigured/provider-failure tests with mocked provider.
+- [x] Browser-test validation, errors, retry, retained input and success.
 - [ ] Verify sender domain/secrets/recipient and real delivery/replies — needs account/domain/inbox setup.
 
-## 4. Publishing workflow and launch metadata — QUEUED
+## 4. Publishing workflow and launch metadata — IN PROGRESS
 
 - [ ] Document/validate adding artwork and photos.
 - [ ] Use shared artist data consistently.
@@ -67,3 +67,4 @@ Scope: one inquiry flow, no address/payment collection; server validation, spam 
 - October 1 task 1: build, strict TypeScript and build-content verification pass; npm audit reports zero vulnerabilities. CI is configured; its remote run awaits push.
 - October 1 task 1: Wrangler dry-run passed (74 static files, SPA fallback and rate-limit binding); no remote deployment performed.
 - October 1 task 2: build/typecheck/content checks pass. Browser verifies direct artwork → gallery navigation, pause/play and manual slides, 44×44 controls, narrow-menu Escape and focus restoration. Reduced-motion rotation guard implemented; physical device/OS setting check remains a launch gate.
+- October 1 task 3: six inquiry test groups pass (including ten invalid inputs); build/typecheck/content verification pass. Local Cloudflare runtime returns clear 503 with no credentials. Browser mock-provider test verifies failure retention, retry, success and Done/focus return. No real email sent.

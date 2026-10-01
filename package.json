@@ -13,7 +13,10 @@
     "prebuild": "npm run images",
     "lint": "tsc --noEmit",
     "verify:build": "node scripts/verify-build.mjs",
-    "check": "npm run build && npm run lint && npm run verify:build"
+    "check": "npm run build && npm run lint && npm test && npm run verify:build",
+    "test": "node --test tests/*.test.mjs",
+    "dev:worker": "wrangler dev",
+    "preview:worker": "wrangler dev --port 8787"
   },
   "dependencies": {
     "lucide-react": "^0.546.0",
