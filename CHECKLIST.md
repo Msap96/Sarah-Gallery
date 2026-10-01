@@ -26,14 +26,14 @@ Scope: complete source package, patched dependencies, CI, content/image checks, 
 - [x] Preserve complete source in Git.
 - [ ] Refresh remote staging and verify routes/headers — needs hosting account access.
 
-## 2. Navigation and accessibility — IN PROGRESS
+## 2. Navigation and accessibility — LOCAL CHECKS PASSED
 
-- [ ] Artwork Back always returns to the gallery.
-- [ ] Carousel touch targets, pause and reduced-motion behavior.
-- [ ] Mobile menu Escape and focus restoration.
-- [ ] Browser-check desktop/narrow layouts and keyboard behavior.
+- [x] Artwork Back always returns to the gallery.
+- [x] Carousel touch targets, pause and reduced-motion behavior.
+- [x] Mobile menu Escape and focus restoration.
+- [x] Browser-check desktop/narrow layouts and keyboard behavior.
 
-## 3. Reliable inquiries — QUEUED
+## 3. Reliable inquiries — IN PROGRESS
 
 Scope: one inquiry flow, no address/payment collection; server validation, spam protection, provider acceptance, explicit UI states and input retention after failure.
 
@@ -66,3 +66,4 @@ Scope: one inquiry flow, no address/payment collection; server validation, spam 
 
 - October 1 task 1: build, strict TypeScript and build-content verification pass; npm audit reports zero vulnerabilities. CI is configured; its remote run awaits push.
 - October 1 task 1: Wrangler dry-run passed (74 static files, SPA fallback and rate-limit binding); no remote deployment performed.
+- October 1 task 2: build/typecheck/content checks pass. Browser verifies direct artwork → gallery navigation, pause/play and manual slides, 44×44 controls, narrow-menu Escape and focus restoration. Reduced-motion rotation guard implemented; physical device/OS setting check remains a launch gate.

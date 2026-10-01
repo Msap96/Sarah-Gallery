@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { NavLink, useParams } from 'react-router';
 import { useGallery } from '../contexts/GalleryContext';
 import { getArtworkImages } from '../lib/artworkImages';
 import { ArtImage } from '../components/ArtImage';
@@ -12,7 +12,6 @@ import { ArrowLeft } from 'lucide-react';
 
 export const WorkDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { artworks, artistInfo } = useGallery();
   const work = artworks.find(a => a.id === id);
 
@@ -66,12 +65,12 @@ export const WorkDetail: React.FC = () => {
   return (
     <div className="flex-grow flex flex-col md:flex-row bg-[#F7F5F2]">
       <div className="w-full md:w-2/3 h-[60vh] md:h-auto min-h-[calc(100vh-5rem)] bg-[#EAE7E1] flex flex-col items-center justify-center p-8 md:p-16 relative">
-        <button
-          onClick={() => navigate(-1)}
+        <NavLink
+          to="/gallery"
           className="absolute top-8 left-8 md:top-12 md:left-12 flex items-center text-[10px] font-bold tracking-widest uppercase text-[#8C7E6D] hover:text-[#2D2926] transition-colors z-10"
         >
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back
-        </button>
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to gallery
+        </NavLink>
         {showInRoom && hasKnownScale(work) ? (
           <motion.div
             key="room-view"

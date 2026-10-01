@@ -5,6 +5,8 @@ import { ArtworkCard } from '../components/ArtworkCard';
 import { ArtImage } from '../components/ArtImage';
 import { formatDimensions } from '../lib/dimensions';
 import { artistInfo } from '../data';
+import { useReducedMotion } from 'motion/react';
+import { Pause, Play } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { artworks } = useGallery();
@@ -16,14 +18,16 @@ export const Home: React.FC = () => {
   // whole catalogue at full resolution just to fill the first screen.
   const heroWorks = featuredWorks.length > 0 ? featuredWorks : artworks.slice(0, 1);
   const [heroIndex, setHeroIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
-    if (heroWorks.length <= 1) return;
+    if (heroWorks.length <= 1 || isPaused || reducedMotion) return;
     const interval = setInterval(() => {
       setHeroIndex(prev => (prev + 1) % heroWorks.length);
     }, 6500);
     return () => clearInterval(interval);
-  }, [heroWorks.length]);
+  }, [heroWorks.length, isPaused, reducedMotion]);
 
   const heroWork = heroWorks[heroIndex] ?? heroWorks[0];
 
@@ -67,7 +71,7 @@ export const Home: React.FC = () => {
         <NavLink
           to="/gallery"
           aria-label="Enter the gallery"
-          className="absolute inset-0 z-10 flex flex-col justify-end px-8 pb-14 sm:px-12 sm:pb-16 group"
+          className="absolute inset-0 z-10 flex flex-col justify-end px-8 pb-24 sm:px-12 sm:pb-24 group"
         >
           {/*
             The `key` replays the CSS entrance animation on each change. The
@@ -93,19 +97,25 @@ export const Home: React.FC = () => {
         </NavLink>
 
         {heroWorks.length > 1 && (
-          <div className="absolute bottom-14 right-8 sm:bottom-16 sm:right-12 z-20 flex gap-2">
+          <div className="absolute bottom-4 right-8 sm:right-12 z-20 flex items-center gap-1">
             {heroWorks.map((work, idx) => (
               <button
                 key={work.id}
                 type="button"
-                onClick={() => setHeroIndex(idx)}
+                onClick={() => { setHeroIndex(idx); setIsPaused(true); }}
                 aria-label={`Show ${work.title}`}
                 aria-current={idx === heroIndex}
-                className={`h-px transition-all duration-500 ${
-                  idx === heroIndex ? 'w-10 bg-white' : 'w-5 bg-white/40 hover:bg-white/70'
-                }`}
-              />
+                className="w-11 h-11 flex items-center justify-center hover:bg-white/10 rounded-sm"
+              >
+                <span aria-hidden="true" className={`h-px transition-all duration-500 ${idx === heroIndex ? 'w-10 bg-white' : 'w-5 bg-white/40'}`} />
+              </button>
             ))}
+            {!reducedMotion && (
+              <button type="button" onClick={() => setIsPaused(p => !p)} aria-label={isPaused ? 'Play slideshow' : 'Pause slideshow'}
+                className="w-11 h-11 flex items-center justify-center text-white hover:bg-white/10 rounded-sm">
+                {isPaused ? <Play aria-hidden="true" size={16} /> : <Pause aria-hidden="true" size={16} />}
+              </button>
+            )}
           </div>
         )}
       </section>

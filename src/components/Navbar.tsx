@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router';
 import { artistInfo } from '../data';
 import { Menu, X } from 'lucide-react';
@@ -9,6 +9,31 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    menuRef.current?.querySelector<HTMLAnchorElement>('a')?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+        toggleRef.current?.focus();
+      }
+      if (event.key === 'Tab') {
+        const controls = [toggleRef.current, ...Array.from(menuRef.current?.querySelectorAll<HTMLAnchorElement>('a') ?? [])].filter(Boolean) as HTMLElement[];
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
+    };
+    const desktop = window.matchMedia('(min-width: 640px)');
+    const closeOnDesktop = () => { if (desktop.matches) setMenuOpen(false); };
+    document.addEventListener('keydown', onKeyDown);
+    desktop.addEventListener('change', closeOnDesktop);
+    return () => { document.removeEventListener('keydown', onKeyDown); desktop.removeEventListener('change', closeOnDesktop); };
+  }, [menuOpen]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
@@ -39,6 +64,7 @@ export const Navbar: React.FC = () => {
           </nav>
 
           <button
+            ref={toggleRef}
             type="button"
             className="sm:hidden p-2 -mr-2 text-[#2D2926] hover:opacity-70 transition-opacity"
             onClick={() => setMenuOpen(prev => !prev)}
@@ -65,6 +91,8 @@ export const Navbar: React.FC = () => {
               aria-label="Close menu"
             />
             <motion.nav
+              ref={menuRef}
+              aria-label="Mobile navigation"
               id="mobile-nav"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
