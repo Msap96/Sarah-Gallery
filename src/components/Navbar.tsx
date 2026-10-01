@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router';
-import { artistInfo } from '../data';
+import { useGallery } from '../contexts/GalleryContext';
 import { Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 
@@ -8,6 +8,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `transition-colors hover:opacity-100 ${isActive ? 'opacity-100 underline underline-offset-8 decoration-[#8C7E6D]' : ''}`;
 
 export const Navbar: React.FC = () => {
+  const { artistInfo } = useGallery();
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLElement>(null);

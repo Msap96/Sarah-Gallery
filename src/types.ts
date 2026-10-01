@@ -24,6 +24,8 @@ export interface Artwork {
   featured?: boolean;
   status: 'available' | 'sold' | 'not-for-sale';
   description?: string;
+  /** Enable only after the photo is cropped to canvas edges and size is verified. */
+  scalePreviewReady?: boolean;
 }
 
 export interface Collection {

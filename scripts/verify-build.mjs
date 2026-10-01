@@ -18,6 +18,11 @@ for (const work of artworks) {
     assert(dimension === undefined || (Number.isFinite(dimension) && dimension > 0), `Invalid size: ${work.id}`);
   }
   assert(!work.collection || collectionsById.has(work.collection), `Unknown collection: ${work.id}`);
+  if (work.scalePreviewReady) {
+    const image = generatedImages[work.imageUrl];
+    assert(work.widthIn > 0 && work.heightIn > 0 && image, `Scale preview needs verified size/photo: ${work.id}`);
+    assert(Math.abs(image.width / image.height / (work.widthIn / work.heightIn) - 1) < 0.05, `Scale preview photo must match canvas proportions: ${work.id}`);
+  }
   for (const image of [work.imageUrl, ...(work.additionalImageUrls ?? [])]) images.add(image);
 }
 for (const image of images) {
@@ -28,4 +33,12 @@ for (const image of images) {
   for (const path of paths) assert((await stat(`dist${path}`)).size > 0, `Missing/empty image: ${path}`);
 }
 assert((await readFile('dist/_headers', 'utf8')).includes('Content-Security-Policy:'), 'Missing deployed security headers.');
+for (const work of artworks) {
+  const html = await readFile(`dist/work/${work.id}.html`, 'utf8');
+  assert(html.includes('<link rel="canonical"'), `Missing canonical: ${work.id}`);
+  assert(html.includes(`content="${work.title.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')} — `), `Missing work-specific preview: ${work.id}`);
+  assert(html.includes(work.imageUrl), `Missing preview image: ${work.id}`);
+}
+const sitemap = await readFile('dist/sitemap.xml', 'utf8');
+for (const work of artworks) assert(sitemap.includes(`/work/${work.id}`), `Missing sitemap entry: ${work.id}`);
 console.log(`Verified ${artworks.length} artworks, ${images.size} image families, and deployment headers.`);

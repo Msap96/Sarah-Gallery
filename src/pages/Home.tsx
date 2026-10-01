@@ -4,12 +4,11 @@ import { useGallery } from '../contexts/GalleryContext';
 import { ArtworkCard } from '../components/ArtworkCard';
 import { ArtImage } from '../components/ArtImage';
 import { formatDimensions } from '../lib/dimensions';
-import { artistInfo } from '../data';
 import { useReducedMotion } from 'motion/react';
 import { Pause, Play } from 'lucide-react';
 
 export const Home: React.FC = () => {
-  const { artworks } = useGallery();
+  const { artworks, artistInfo } = useGallery();
   const featuredWorks = useMemo(
     () => artworks.filter(art => art.featured).slice(0, 3),
     [artworks]
@@ -33,6 +32,7 @@ export const Home: React.FC = () => {
 
   return (
     <div className="flex-grow flex flex-col">
+      <h1 className="sr-only">Paintings by {artistInfo.name}</h1>
       {/*
         Hero: the work is shown full strength, edge to edge. It used to sit at
         20% opacity behind a button, which made the painting into wallpaper.

@@ -24,9 +24,10 @@ export const ArtworkCard: React.FC<Props> = ({ artwork, index, compact = false }
         <ArtImage
           src={artwork.imageUrl}
           alt={artwork.title}
+          fit="contain"
           priority={index < 3}
           sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
-          className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none"
+          className="object-contain w-full h-full"
         />
       </NavLink>
       <div className="flex flex-col flex-grow justify-between mt-2">

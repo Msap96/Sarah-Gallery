@@ -1,70 +1,34 @@
 # Sarah Sandia Gallery
 
-Personal artist portfolio and gallery for [Sarah Sandia](https://instagram.com/artsandiaa) — a clean, distraction-free site for browsing works, viewing piece details, and sending purchase or inquiry requests.
+React/TypeScript/Vite artist portfolio with responsive images and a Cloudflare Worker inquiry API. See [CHECKLIST.md](CHECKLIST.md) for current progress and live-launch gates; previous notes are preserved in CHECKLIST.history.md.
 
-## Stack
+## Development and validation
 
-- **React 19** + **TypeScript**
-- **Vite 6**
-- **Tailwind CSS 4**
-- **React Router 7**
-- **Motion** (animations)
-- Deployed on **Vercel** (`vercel.json` SPA rewrites)
+Use Node 24 (engines support Node 24–26), then npm ci.
 
-## Features
+- npm run dev:local — local Vite UI (the inquiry API requires the Worker).
+- npm run check — build responsive images and route metadata, strict TypeScript, API/metadata tests, and catalogue/image verification.
+- npm run preview:worker — serve the built website and actual Worker locally on port 8787.
+- npx wrangler deploy --dry-run — package without publishing.
 
-- Home with rotating hero and featured works
-- Portfolio gallery with availability filtering
-- Work detail pages with image gallery, dimensions, and status
-- Purchase / inquiry forms (currently open a prefilled `mailto:` to the studio)
-- Artist bio and contact links
+CI runs npm ci, npm run check, and Worker dry-run on push/PR. Generated public/artworks and dist are ignored. All original photos, fonts, source components and generation scripts are committed. The first cold image build takes several minutes.
 
-## Project structure
+## Inquiries
 
-```
-src/
-  components/   # Layout, Navbar, Footer, ArtworkCard, Modal
-  contexts/     # Gallery data provider
-  hooks/        # useGalleryData
-  lib/          # Artwork image helpers
-  pages/        # Home, Gallery, WorkDetail, About
-  data.ts       # Artworks, collections, artist info (edit here to update content)
-  types.ts      # Shared TypeScript types
-```
+The available-work page submits one name/email/message form to POST /api/inquiry. The Worker validates the catalogue entry and fields, checks same origin, discards honeypot submissions, applies five requests/minute per IP, and sends via Resend with the visitor as reply-to. Success requires a provider receipt; failures retain form input. No checkout or shipping-address collection is implemented.
 
-Artwork images are served from `/artworks/` (public static assets).
+Configure RESEND_API_KEY, INQUIRY_FROM and INQUIRY_TO as Cloudflare Worker secrets. INQUIRY_FROM must use a verified sending domain; INQUIRY_TO is a tested, monitored inbox. For local configuration, copy .dev.vars.example to .dev.vars. Never put these values in VITE_* variables or Git. Without configuration the API returns a clear 503; the form also offers the studio email link.
 
-## Getting started
+Automated and browser verification uses mocked email; real delivery/replies remain a release gate.
 
-**Prerequisites:** Node.js 18+
+## Hosting and metadata
 
-```bash
-npm install
-npm run dev
-```
+wrangler.jsonc prepares Cloudflare Workers Static Assets, SPA fallback, clean HTML routes and /api routing. public/_headers carries security/cache headers for static responses. vercel.json is retained for the existing staging deployment; Vercel Hobby has commercial-use restrictions and the new inquiry API targets Cloudflare.
 
-The app runs at [http://localhost:3000](http://localhost:3000).
+Set SITE_URL to the final HTTPS origin (for example https://example.com) in the build environment. Build generates individual artwork/about/gallery HTML previews, canonical URLs, sitemap.xml and robots.txt. Without SITE_URL, preview builds are noindex and use the recorded staging origin for preview metadata. Do not publish production with that default.
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Dev server on `0.0.0.0:3000` |
-| `npm run dev:local` | Dev server on `localhost:3000` |
-| `npm run build` | Production build |
-| `npm run preview` | Preview the production build |
-| `npm run lint` | Typecheck (`tsc --noEmit`) |
+After account access and release gates are resolved: run npm run check, review the Worker dry-run, configure secrets/domain, deploy the reviewed version with Wrangler or Cloudflare's Git integration, and verify routes/headers plus an actual delivered inquiry. Deployments and account setup have not been performed by the local checks.
 
-No environment variables are required. See [`.env.example`](.env.example).
+## Updating artwork
 
-## Updating content
-
-Edit [`src/data.ts`](src/data.ts) to change:
-
-- Artworks (title, year, medium, dimensions, price, status, images, featured flag)
-- Collections
-- Artist bio, email, and social links
-
-Add or replace image files under the public `artworks` folder and point `imageUrl` / `additionalImageUrls` at those paths.
-
-## Deployment
-
-Push to the connected GitHub repo; Vercel builds with `npm run build` and serves the SPA. All routes rewrite to `index.html` so client-side routing works on refresh.
+See [docs/PUBLISHING.md](docs/PUBLISHING.md) for adding work, marking it sold, scale-preview verification, and the queued private editor's acceptance scope. Content currently lives in src/data.ts; self-service editing is not implemented yet.

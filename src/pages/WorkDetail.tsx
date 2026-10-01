@@ -3,7 +3,7 @@ import { NavLink, useParams } from 'react-router';
 import { useGallery } from '../contexts/GalleryContext';
 import { getArtworkImages } from '../lib/artworkImages';
 import { ArtImage } from '../components/ArtImage';
-import { formatDimensions, hasKnownScale } from '../lib/dimensions';
+import { formatDimensions, hasVerifiedScale } from '../lib/dimensions';
 import { Modal } from '../components/Modal';
 import { RoomView } from '../components/RoomView';
 import { NotFound } from './NotFound';
@@ -66,7 +66,7 @@ export const WorkDetail: React.FC = () => {
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to gallery
         </NavLink>
-        {showInRoom && hasKnownScale(work) ? (
+        {showInRoom && hasVerifiedScale(work) ? (
           <motion.div
             key="room-view"
             initial={{ opacity: 0, scale: 0.98 }}
@@ -95,7 +95,7 @@ export const WorkDetail: React.FC = () => {
           </motion.div>
         )}
 
-        {hasKnownScale(work) && (
+        {hasVerifiedScale(work) && (
           <div className="flex gap-6 mt-6 text-[10px] uppercase tracking-widest font-bold">
             <button
               type="button"

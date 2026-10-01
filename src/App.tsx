@@ -13,6 +13,7 @@ import { WorkDetail } from './pages/WorkDetail';
 import { About } from './pages/About';
 import { NotFound } from './pages/NotFound';
 import { GalleryProvider } from './contexts/GalleryContext';
+import { RouteMetadata } from './components/RouteMetadata';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -31,6 +32,7 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       <GalleryProvider>
         <BrowserRouter>
+          <RouteMetadata />
           <ScrollToTop />
           <Routes>
             <Route path="/" element={<Layout />}>

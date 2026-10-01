@@ -1,10 +1,15 @@
-import { Artwork } from '../types';
+import type { Artwork } from '../types';
 
 /** An artwork with a known physical size, so it can be shown to scale. */
 export type ScaledArtwork = Artwork & { widthIn: number; heightIn: number };
 
 export function hasKnownScale(work: Artwork): work is ScaledArtwork {
-  return typeof work.widthIn === 'number' && typeof work.heightIn === 'number';
+  return typeof work.widthIn === 'number' && Number.isFinite(work.widthIn) && work.widthIn > 0 &&
+    typeof work.heightIn === 'number' && Number.isFinite(work.heightIn) && work.heightIn > 0;
+}
+
+export function hasVerifiedScale(work: Artwork): work is ScaledArtwork {
+  return work.scalePreviewReady === true && hasKnownScale(work);
 }
 
 /** Trims trailing zeros so 17.3 stays 17.3 but 30.0 reads as 30. */

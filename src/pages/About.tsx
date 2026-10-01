@@ -27,7 +27,7 @@ export const About: React.FC = () => {
         transition={{ duration: 0.8, delay: 0.2 }}
         className="w-full lg:w-1/2 flex flex-col justify-center min-h-[75vh] lg:min-h-0"
       >
-        <h3 className="text-[10px] uppercase tracking-widest font-bold mb-4 text-[#8C7E6D]">Artist Bio</h3>
+        <h1 className="text-[10px] uppercase tracking-widest font-bold mb-4 text-[#8C7E6D]">Artist Bio</h1>
         <div className="font-serif text-2xl leading-relaxed italic text-[#5E503F] mb-8">
           <p>{artistInfo.bio}</p>
         </div>
