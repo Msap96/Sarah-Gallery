@@ -2,7 +2,7 @@
 
 Updated October 1, 2026. Active scope; CHECKLIST.history.md preserves previous notes.
 
-Current position: four local preparation tasks implemented and tested. The public staging website has not been refreshed. Authenticated GitHub read/write access is confirmed; Cloudflare is not logged in. Live email delivery and Sarah's private content editor remain unfinished.
+Current position: four preparation tasks implemented, tested and pushed to GitHub main. GitHub validation passed for website revision 74f9785, and the existing Vercel integration refreshed https://sarah-gallery.vercel.app/. Deployed gallery/artwork navigation, missing-page screen, security headers and preview robots rules were verified. Cloudflare is not logged in. Live email delivery and Sarah's private content editor remain unfinished.
 
 ## Working agreement
 
@@ -26,7 +26,8 @@ Scope: complete source package, patched dependencies, CI, content/image checks, 
 - [x] Prepare Cloudflare config, SPA fallback and security headers.
 - [x] Verify build and local Worker packaging.
 - [x] Preserve complete source in Git.
-- [ ] Refresh remote staging and verify routes/headers — needs hosting account access.
+- [x] Refresh existing Vercel staging and verify navigation/routes/headers.
+- [ ] Activate production Cloudflare hosting and inquiry service — needs selected account/domain/email configuration.
 
 ## 2. Navigation and accessibility — LOCAL CHECKS PASSED
 
@@ -74,3 +75,4 @@ Scope: one inquiry flow, no address/payment collection; server validation, spam 
 - October 1 task 3: six inquiry test groups pass (including ten invalid inputs); build/typecheck/content verification pass. Local Cloudflare runtime returns clear 503 with no credentials. Browser mock-provider test verifies failure retention, retry, success and Done/focus return. No real email sent.
 - October 1 task 4: full npm run check passes (production build, strict TypeScript, inquiry/metadata tests, nine artwork entries and ten image families). Production-origin/indexability and repeated preview/noindex generation pass. Worker dry-run packages 88 assets. Browser verifies route titles/artwork previews, full-photo cards and hidden unverified scale controls. Private editor acceptance is documented, not implemented.
 - October 1 account checks: GitHub repository access includes read/write/admin; no push performed. Wrangler whoami reports no authenticated Cloudflare account. No remote deployment or live inbox verification performed.
+- October 1 subsequent push: four implementation commits pushed to main (74f9785). [GitHub validation](https://github.com/Msap96/Sarah-Gallery/actions/runs/36929835844) passed, including cold image generation, build, TypeScript, tests, content verification and Worker dry-run. Existing Vercel automatic deployment succeeded; browser confirms nine works, artwork page, Back to Gallery and missing-page screen. HTTPS responses include expected security headers; robots.txt blocks preview indexing. The Vercel staging deployment does not activate the Cloudflare inquiry API or verify live delivery.
