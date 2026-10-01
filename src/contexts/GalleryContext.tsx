@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import { useGalleryData } from '../hooks/useGalleryData';
 import { Artwork, Collection, ArtistInfo } from '../types';
 

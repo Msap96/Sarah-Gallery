@@ -1,70 +1,113 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { NavLink } from 'react-router';
 import { useGallery } from '../contexts/GalleryContext';
 import { ArtworkCard } from '../components/ArtworkCard';
-import { motion, AnimatePresence } from 'motion/react';
+import { ArtImage } from '../components/ArtImage';
+import { formatDimensions } from '../lib/dimensions';
+import { artistInfo } from '../data';
 
 export const Home: React.FC = () => {
   const { artworks } = useGallery();
-  const featuredWorks = artworks.filter(art => art.featured).slice(0, 3);
-  const heroImages = artworks.map(work => work.imageUrl);
+  const featuredWorks = useMemo(
+    () => artworks.filter(art => art.featured).slice(0, 3),
+    [artworks]
+  );
+  // Only the featured works cycle in the hero, so the page never pulls the
+  // whole catalogue at full resolution just to fill the first screen.
+  const heroWorks = featuredWorks.length > 0 ? featuredWorks : artworks.slice(0, 1);
   const [heroIndex, setHeroIndex] = useState(0);
 
   useEffect(() => {
-    if (heroImages.length <= 1) return;
+    if (heroWorks.length <= 1) return;
     const interval = setInterval(() => {
-      setHeroIndex(prev => (prev + 1) % heroImages.length);
-    }, 5000);
+      setHeroIndex(prev => (prev + 1) % heroWorks.length);
+    }, 6500);
     return () => clearInterval(interval);
-  }, [heroImages.length]);
+  }, [heroWorks.length]);
 
-  const heroImage = heroImages[heroIndex] ?? artworks[0]?.imageUrl;
+  const heroWork = heroWorks[heroIndex] ?? heroWorks[0];
 
   return (
     <div className="flex-grow flex flex-col">
-      {/* Hero Section */}
-      <section className="relative min-h-[70vh] flex items-center justify-center bg-[#E5E1DA] overflow-hidden">
-        <AnimatePresence mode="wait">
-          {heroImage && (
-            <motion.div
-              key={heroImage}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.5, ease: 'easeOut' }}
-              className="absolute inset-0"
-            >
-              <img
-                src={heroImage}
-                alt=""
-                className="w-full h-full object-cover opacity-20 mix-blend-multiply"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-col sm:flex-row justify-center items-center gap-4"
+      {/*
+        Hero: the work is shown full strength, edge to edge. It used to sit at
+        20% opacity behind a button, which made the painting into wallpaper.
+        The only overlay is a bottom scrim, so the caption stays legible without
+        washing out the image.
+      */}
+      <section className="on-dark relative h-[calc(100vh-5rem)] min-h-[420px] bg-[#2D2926] overflow-hidden">
+        {/*
+          Every frame is a permanent layer, crossfaded with a CSS opacity
+          transition. Mount/unmount crossfades (AnimatePresence) proved fragile
+          here: if an animation stalls, exiting layers never unmount, they stack
+          up, and the frame on top stops matching the caption. Fixed layers
+          cannot drift out of sync, and the resting state is a class, not the
+          end point of an animation.
+        */}
+        {heroWorks.map((work, idx) => (
+          <div
+            key={work.id}
+            aria-hidden={idx !== heroIndex}
+            className={`absolute inset-0 transition-opacity duration-[1600ms] ease-out motion-reduce:transition-none ${
+              idx === heroIndex ? 'opacity-100' : 'opacity-0'
+            }`}
           >
-            <NavLink 
-              to="/gallery" 
-              className="inline-block px-8 py-4 bg-[#2D2926] text-[#F7F5F2] text-[10px] tracking-widest font-bold uppercase hover:bg-[#5E503F] transition-colors w-full sm:w-auto"
-            >
-              Enter the Gallery
-            </NavLink>
-            <a 
-              href="https://metasteps.com/viewer/028ab4de-7fdb-47a8-a00d-948cb53ad6fd" 
-              target="_blank" 
-              rel="noreferrer"
-              className="inline-block px-8 py-4 border border-[#2D2926] text-[#2D2926] text-[10px] tracking-widest font-bold uppercase hover:bg-[#2D2926] hover:text-[#F7F5F2] transition-colors w-full sm:w-auto"
-            >
-              View 3D Exhibition ↗
-            </a>
-          </motion.div>
-        </div>
+            <ArtImage
+              src={work.imageUrl}
+              alt={idx === heroIndex ? `${work.title} by ${artistInfo.name}` : ''}
+              priority={idx === 0}
+              sizes="100vw"
+              className={`w-full h-full object-cover ${idx === heroIndex ? 'hero-drift' : ''}`}
+            />
+          </div>
+        ))}
+
+        <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/55 to-transparent pointer-events-none" />
+
+        <NavLink
+          to="/gallery"
+          aria-label="Enter the gallery"
+          className="absolute inset-0 z-10 flex flex-col justify-end px-8 pb-14 sm:px-12 sm:pb-16 group"
+        >
+          {/*
+            The `key` replays the CSS entrance animation on each change. The
+            animation has no fill-mode, so the element's resting state is simply
+            visible: if it never runs, the caption still reads. Never gate
+            essential text on an animation completing.
+          */}
+          {heroWork && (
+            <div key={heroWork.id} className="max-w-xl hero-caption">
+              <h2 className="font-serif italic text-3xl sm:text-4xl text-white mb-2 drop-shadow-sm">
+                {heroWork.title}
+              </h2>
+              <p className="text-[10px] uppercase tracking-widest text-white/70">
+                {heroWork.medium}, {formatDimensions(heroWork)}, {heroWork.year}
+              </p>
+            </div>
+          )}
+
+          <span className="mt-10 inline-flex items-center gap-3 text-[10px] uppercase tracking-widest font-bold text-white w-max">
+            Enter the Gallery
+            <span className="w-10 h-px bg-white/60 transition-all duration-500 group-hover:w-16" />
+          </span>
+        </NavLink>
+
+        {heroWorks.length > 1 && (
+          <div className="absolute bottom-14 right-8 sm:bottom-16 sm:right-12 z-20 flex gap-2">
+            {heroWorks.map((work, idx) => (
+              <button
+                key={work.id}
+                type="button"
+                onClick={() => setHeroIndex(idx)}
+                aria-label={`Show ${work.title}`}
+                aria-current={idx === heroIndex}
+                className={`h-px transition-all duration-500 ${
+                  idx === heroIndex ? 'w-10 bg-white' : 'w-5 bg-white/40 hover:bg-white/70'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Featured Works */}

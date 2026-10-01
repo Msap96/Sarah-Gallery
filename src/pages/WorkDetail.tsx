@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useGallery } from '../contexts/GalleryContext';
 import { getArtworkImages } from '../lib/artworkImages';
+import { ArtImage } from '../components/ArtImage';
+import { formatDimensions, hasKnownScale } from '../lib/dimensions';
 import { Modal } from '../components/Modal';
+import { RoomView } from '../components/RoomView';
+import { NotFound } from './NotFound';
 import { motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
 
@@ -22,9 +26,10 @@ export const WorkDetail: React.FC = () => {
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [showInRoom, setShowInRoom] = useState(false);
 
   if (!work) {
-    return <div className="flex-grow flex items-center justify-center p-8">Work not found.</div>;
+    return <NotFound />;
   }
 
   const images = getArtworkImages(work);
@@ -67,16 +72,65 @@ export const WorkDetail: React.FC = () => {
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Back
         </button>
-        <motion.img
-          key={activeImage}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          src={activeImage}
-          alt={work.title}
-          className="max-w-full max-h-full object-contain shadow-sm border border-[#E5E1DA]"
-        />
-        {images.length > 1 && (
+        {showInRoom && hasKnownScale(work) ? (
+          <motion.div
+            key="room-view"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
+            className="w-full flex justify-center"
+          >
+            <RoomView work={work} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key={activeImage}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-full max-h-full flex items-center justify-center"
+          >
+            <ArtImage
+              src={activeImage}
+              alt={work.title}
+              priority
+              fit="contain"
+              sizes="(min-width: 768px) 66vw, 100vw"
+              className="max-w-full max-h-full object-contain shadow-sm border border-[#E5E1DA]"
+            />
+          </motion.div>
+        )}
+
+        {hasKnownScale(work) && (
+          <div className="flex gap-6 mt-6 text-[10px] uppercase tracking-widest font-bold">
+            <button
+              type="button"
+              onClick={() => setShowInRoom(false)}
+              aria-pressed={!showInRoom}
+              className={`transition-opacity hover:opacity-100 ${
+                showInRoom
+                  ? 'opacity-40'
+                  : 'opacity-100 underline underline-offset-8 decoration-[#8C7E6D]'
+              }`}
+            >
+              Artwork
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowInRoom(true)}
+              aria-pressed={showInRoom}
+              className={`transition-opacity hover:opacity-100 ${
+                showInRoom
+                  ? 'opacity-100 underline underline-offset-8 decoration-[#8C7E6D]'
+                  : 'opacity-40'
+              }`}
+            >
+              View to Scale
+            </button>
+          </div>
+        )}
+
+        {!showInRoom && images.length > 1 && (
           <div className="flex gap-3 mt-6">
             {images.map((url, index) => (
               <button
@@ -90,7 +144,12 @@ export const WorkDetail: React.FC = () => {
                 }`}
                 aria-label={`View image ${index + 1} of ${images.length}`}
               >
-                <img src={url} alt="" className="w-full h-full object-cover" />
+                <ArtImage
+                  src={url}
+                  alt=""
+                  sizes="64px"
+                  className="w-full h-full object-cover"
+                />
               </button>
             ))}
           </div>
@@ -109,7 +168,7 @@ export const WorkDetail: React.FC = () => {
           <div className="space-y-4 text-[10px] uppercase tracking-widest text-[#2D2926] mb-12">
             <div className="flex justify-between border-b border-[#E5E1DA] pb-2">
               <span className="opacity-40">Dimensions</span>
-              <span className="text-right">{work.dimensions}</span>
+              <span className="text-right">{formatDimensions(work)}</span>
             </div>
             <div className="flex justify-between border-b border-[#E5E1DA] pb-2">
               <span className="opacity-40">Price</span>
@@ -171,7 +230,12 @@ export const WorkDetail: React.FC = () => {
       <Modal isOpen={isPurchaseModalOpen} onClose={() => setIsPurchaseModalOpen(false)} title="Purchase Request">
         <form onSubmit={handlePurchaseSubmit} className="space-y-4">
           <div className="bg-[#EAE7E1] border border-[#E5E1DA] p-4 mb-4 flex items-center space-x-4">
-            <img src={work.imageUrl} alt={work.title} className="w-12 h-12 object-cover border border-[#E5E1DA]" />
+            <ArtImage
+              src={work.imageUrl}
+              alt={work.title}
+              sizes="48px"
+              className="w-12 h-12 object-cover border border-[#E5E1DA]"
+            />
             <div>
               <div className="font-serif italic text-sm text-[#2D2926]">{work.title}</div>
               <div className="text-[10px] uppercase tracking-widest text-[#8C7E6D]">

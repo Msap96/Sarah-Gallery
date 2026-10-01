@@ -18,7 +18,6 @@ Personal artist portfolio and gallery for [Sarah Sandia](https://instagram.com/a
 - Work detail pages with image gallery, dimensions, and status
 - Purchase / inquiry forms (currently open a prefilled `mailto:` to the studio)
 - Artist bio and contact links
-- External link to a 3D exhibition viewer (Metasteps)
 
 ## Project structure
 

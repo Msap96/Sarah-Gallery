@@ -1,7 +1,147 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 @import "tailwindcss";
+
+/*
+  Self-hosted fonts (files in public/fonts, downloaded from Google Fonts).
+  Replaces a render-blocking third-party @import and lets the CSP drop
+  fonts.googleapis.com / fonts.gstatic.com entirely.
+
+  Only the faces the site actually renders are shipped: Playfair is used
+  exclusively in italic, so the three upright cuts were dropped, as were
+  Inter 300 and the unused weights. Note `font-bold` (700) has no real cut
+  here — same as the previous Google import, so weight 600 is what it
+  resolves to. Adding a true 700 would make bold text slightly heavier.
+*/
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/inter-500.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-600.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/playfair-display-400-italic.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+}
+
+/*
+  <picture> generates a box that breaks max-height/flex containment for the
+  <img> inside it. display:contents removes that box so the image lays out as
+  a direct child of whatever contains the picture.
+*/
+picture {
+  display: contents;
+}
+
+/*
+  Visible keyboard focus. The site previously had none anywhere, and one
+  component removed the default outline outright, which left keyboard users
+  with no indication of position. :focus-visible keeps it off for mouse clicks.
+*/
+:focus-visible {
+  outline: 2px solid #2d2926;
+  outline-offset: 3px;
+}
+
+/* On dark backgrounds (the hero) the dark ring is invisible. */
+.on-dark :focus-visible {
+  outline-color: #f7f5f2;
+}
+
+/*
+  Film grain. A single inlined SVG turbulence tile, fixed over the viewport at
+  very low opacity — enough to give flat colour fields some tooth without
+  reading as an effect. pointer-events:none so it never intercepts a click.
+  Uses a data: URI, which the CSP already allows under img-src.
+*/
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/*
+  Slow drift on the active hero frame. Scale only — no translation — so the
+  painting never crops differently than intended, and the movement reads as
+  breath rather than motion.
+*/
+@keyframes hero-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+.hero-drift {
+  animation: hero-drift 20s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain::after {
+    display: none;
+  }
+
+  .hero-drift {
+    animation: none;
+  }
+}
+
+/*
+  Hero caption entrance. Deliberately no fill-mode: the element's resting state
+  is fully visible, so a stalled or unsupported animation degrades to plain
+  visible text rather than hiding the artwork title.
+*/
+@keyframes hero-caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-caption {
+  animation: hero-caption-in 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-caption {
+    animation: none;
+  }
 }

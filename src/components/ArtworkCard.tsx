@@ -1,7 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router';
 import { Artwork } from '../types';
-import { motion } from 'motion/react';
+import { ArtImage } from './ArtImage';
+import { Reveal } from './Reveal';
 
 interface Props {
   artwork: Artwork;
@@ -11,18 +12,21 @@ interface Props {
 
 export const ArtworkCard: React.FC<Props> = ({ artwork, index, compact = false }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
-      className="group flex flex-col"
-    >
+    /*
+      Reveal on scroll rather than on mount. The old mount animation played its
+      `index * 0.1` delay immediately, so lower rows had already finished by the
+      time you scrolled to them — the effect only ever showed on the first row.
+      Reveal ties it to the viewport and, unlike whileInView, cannot leave a
+      card invisible if the observer never fires.
+    */
+    <Reveal delay={(index % 3) * 0.08} className="group flex flex-col">
       <NavLink to={`/work/${artwork.id}`} className="block overflow-hidden bg-[#EAE7E1] border border-[#E5E1DA] mb-4 h-full aspect-[4/5] relative">
-        <img 
-          src={artwork.imageUrl} 
+        <ArtImage
+          src={artwork.imageUrl}
           alt={artwork.title}
-          className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-          referrerPolicy="no-referrer"
+          priority={index < 3}
+          sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
+          className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none"
         />
       </NavLink>
       <div className="flex flex-col flex-grow justify-between mt-2">
@@ -51,6 +55,6 @@ export const ArtworkCard: React.FC<Props> = ({ artwork, index, compact = false }
           </div>
         )}
       </div>
-    </motion.div>
+    </Reveal>
   );
 };

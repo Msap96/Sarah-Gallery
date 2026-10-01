@@ -7,8 +7,6 @@ import { AnimatePresence, motion } from 'motion/react';
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   `transition-colors hover:opacity-100 ${isActive ? 'opacity-100 underline underline-offset-8 decoration-[#8C7E6D]' : ''}`;
 
-const METASTEPS_URL = 'https://metasteps.com/viewer/028ab4de-7fdb-47a8-a00d-948cb53ad6fd';
-
 export const Navbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -38,14 +36,6 @@ export const Navbar: React.FC = () => {
             <NavLink to="/about" className={navLinkClass}>
               Bio
             </NavLink>
-            <a
-              href={METASTEPS_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="transition-colors hover:opacity-100 flex items-center gap-1"
-            >
-              3D Gallery <span className="text-[8px]">↗</span>
-            </a>
           </nav>
 
           <button
@@ -97,15 +87,6 @@ export const Navbar: React.FC = () => {
                 >
                   Bio
                 </NavLink>
-                <a
-                  href={METASTEPS_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="transition-colors hover:opacity-100 flex items-center gap-1 opacity-70"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  3D Gallery <span className="text-[8px]">↗</span>
-                </a>
               </div>
             </motion.nav>
           </>

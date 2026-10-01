@@ -1,6 +1,5 @@
 import React from 'react';
 import { artistInfo } from '../data';
-import { Instagram, Twitter } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useGallery } from '../contexts/GalleryContext';
 import { ArtworkCard } from '../components/ArtworkCard';
-import { motion } from 'motion/react';
 
 export const Gallery: React.FC = () => {
   const { artworks, collections } = useGallery();

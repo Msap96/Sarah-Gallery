@@ -1,7 +1,7 @@
 import React from 'react';
 import { useGallery } from '../contexts/GalleryContext';
+import { ArtImage } from '../components/ArtImage';
 import { motion } from 'motion/react';
-import { Mail, Instagram, Twitter } from 'lucide-react';
 
 export const About: React.FC = () => {
   const { artistInfo } = useGallery();
@@ -13,9 +13,11 @@ export const About: React.FC = () => {
         transition={{ duration: 0.8 }}
         className="w-full lg:w-1/2 aspect-[3/4] max-w-md mb-8 lg:mb-0 border border-[#E5E1DA] p-2 bg-white"
       >
-        <img 
-          src={artistInfo.portraitUrl} 
-          alt={artistInfo.name} 
+        <ArtImage
+          src={artistInfo.portraitUrl}
+          alt={artistInfo.name}
+          priority
+          sizes="(min-width: 1024px) 40vw, 90vw"
           className="w-full h-full object-cover"
         />
       </motion.div>
